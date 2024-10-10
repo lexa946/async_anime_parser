@@ -20,8 +20,7 @@ async def main():
 
         series = await Parser.get_series(client)
 
-        workers = [ f"{seria.name} {seria.episode}" for seria in series]
-        print(f'Найдено {len(workers)} эпизодов.')
+        print(f'Найдено {len(series)} эпизодов.')
 
         tasks = [Parser.download_seria(client, seria, path_save) for seria in series]
         await asyncio.gather(*tasks)
