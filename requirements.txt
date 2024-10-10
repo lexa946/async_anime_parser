@@ -1,0 +1,8 @@
+pydantic
+pydantic-settings
+lxml
+beautifulsoup4
+aiohttp
+aiofile
+tqdm
+
