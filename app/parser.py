@@ -71,15 +71,16 @@ class Parser:
                     'unit_scale': True,
                     'unit_divisor': 1024
                 }
-                with tqdm_asyncio(**tqdm_params) as pbar:
-                    try:
+
+                try:
+                    with tqdm_asyncio(**tqdm_params) as pbar:
                         async for chunk in resp.content.iter_chunked(settings.CHUNK_SIZE):
                             await file.write(chunk)
                             pbar.update(len(chunk))
-                    except asyncio.TimeoutError:
-                        if try_count > 3:
-                            return
-                        await cls.__download_video(client, file_path_save, url, video_name, try_count + 1)
+                except asyncio.TimeoutError:
+                    if try_count > 3:
+                        return
+                    await cls.__download_video(client, file_path_save, url, video_name, try_count + 1)
 
 
 
