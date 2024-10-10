@@ -1,3 +1,4 @@
+import asyncio
 from asyncio import Semaphore
 from pathlib import Path
 
@@ -55,7 +56,7 @@ class Parser:
 
 
     @classmethod
-    async def __download_video(cls,client: ClientSession, file_path_save: str, url: str, video_name: str) -> None:
+    async def __download_video(cls,client: ClientSession, file_path_save: str, url: str, video_name: str, try_count:int = 0) -> None:
         async with async_open(file_path_save, 'wb') as file:
             async with client.get(url) as resp:
                 resp.raise_for_status()
@@ -71,9 +72,16 @@ class Parser:
                     'unit_divisor': 1024
                 }
                 with tqdm_asyncio(**tqdm_params) as pbar:
-                    async for chunk in resp.content.iter_chunked(settings.CHUNK_SIZE):
-                        await file.write(chunk)
-                        pbar.update(len(chunk))
+                    try:
+                        async for chunk in resp.content.iter_chunked(settings.CHUNK_SIZE):
+                            await file.write(chunk)
+                            pbar.update(len(chunk))
+                    except asyncio.TimeoutError:
+                        if try_count > 3:
+                            return
+                        await cls.__download_video(client, file_path_save, url, video_name, try_count + 1)
+
+
 
 
     @classmethod
