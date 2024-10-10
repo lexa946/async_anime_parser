@@ -18,7 +18,10 @@ async def main():
 
     async with ClientSession(headers=headers) as client:
 
-        series = await Parser.get_series(client)
+        if settings.ONE_TARGET_URL:
+            series = [Parser.get_one_seria(settings.ONE_TARGET_URL)]
+        else:
+            series = await Parser.get_series(client)
 
         print(f'Найдено {len(series)} эпизодов.')
 

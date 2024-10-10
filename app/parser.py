@@ -19,6 +19,21 @@ class Parser:
     }
 
     @classmethod
+    def get_one_seria(cls, url: str) -> SAnimeSeria:
+        if settings.MAIN_URL in url:
+            url = url.replace(settings.MAIN_URL, "")
+        series_attributes = url.strip("/").split("/")
+        if len(series_attributes) == 2:
+            name, episode = series_attributes
+            season = None
+        else:
+            name, season, episode = series_attributes
+        anime_seria = SAnimeSeria(name=name, url=settings.MAIN_URL + url, episode=episode.strip(".html"),
+                                  season=season)
+        return anime_seria
+
+
+    @classmethod
     async def get_series(cls, client: ClientSession) -> list[SAnimeSeria]:
         async with client.get(settings.TARGET_URL) as resp:
             if resp.status == 200:
@@ -34,16 +49,8 @@ class Parser:
         for series_link in series_links:
             url = series_link.get('href')
             if "episode" not in url: continue
+            result.append(cls.get_one_seria(url))
 
-            series_attributes = url.strip("/").split("/")
-            if len(series_attributes) == 2:
-                name, episode = series_attributes
-                season = None
-            else:
-                name, season, episode = series_attributes
-            anime_seria = SAnimeSeria(name=name, url=settings.MAIN_URL + url, episode=episode.strip(".html"),
-                                      season=season)
-            result.append(anime_seria)
         return result
 
 

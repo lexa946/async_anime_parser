@@ -5,6 +5,7 @@ class Config(BaseSettings):
     MAIN_URL:str
     TARGET_URL:str
     ONE_TARGET_URL: str
+
     COUNT_THREADS:int
     CHUNK_SIZE:int
 
